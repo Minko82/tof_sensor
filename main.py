@@ -2,24 +2,43 @@ import subprocess
 import time
 import os
 
-# Path to your Arduino CLI and sketch
-arduino_cli_path = "arduino-cli"  # Assumes arduino-cli is in PATH, if it isn't then run: sudo snap install arduino-cli
-sketch_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sketch_jan15a")
-arduino_sketch = os.path.join(sketch_dir, "sketch_jan15a.cpp")
-arduino_port = "/dev/cu.usbmodem1101"  # Adjust for your system (e.g., COM3 on Windows)
-arduino_board = "esp8266:esp8266:nodemcuv2"  # ESP8266 board for VL53L5CX with Wire.begin(6, 7) 
+# --- CONFIGURATION ---
+arduino_cli_path = "arduino-cli"
 
-# Compile and upload Arduino sketch
+# Get absolute path to the current directory
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Point to the SKETCH folder
+sketch_dir = os.path.join(base_dir, "sketch_jan15a")
+# Point to the SparkFun VL53L5CX library folder
+sparkfun_lib_path = os.path.join(base_dir, "SparkFun_VL53L5CX_Arduino_Library")
+
+arduino_port = "/dev/cu.usbmodem1101" 
+arduino_board = "esp32:esp32:esp32c6"
+
+# --- COMMANDS ---
 compile_cmd = [
-    arduino_cli_path, "compile", "--fqbn", arduino_board, arduino_sketch
-]
-upload_cmd = [
-    arduino_cli_path, "upload", "-p", arduino_port, "--fqbn", arduino_board, arduino_sketch
+    arduino_cli_path, 
+    "compile", 
+    "--fqbn", arduino_board, 
+    "--libraries", sparkfun_lib_path,
+    sketch_dir
 ]
 
+upload_cmd = [
+    arduino_cli_path, 
+    "upload", 
+    "-p", arduino_port, 
+    "--fqbn", arduino_board, 
+    sketch_dir
+]
+
+print(f"Compiling with custom library from {sparkfun_lib_path}...")
 subprocess.run(compile_cmd, check=True)
+
+print(f"Uploading to {arduino_board}...")
 subprocess.run(upload_cmd, check=True)
 
-time.sleep(2)
-
+print("Upload complete. Launching Python Viz...")
+time.sleep(3) 
 subprocess.run(["python3", "tof_matrix_viz.py"], check=True)
