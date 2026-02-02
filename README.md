@@ -10,14 +10,19 @@
    sudo snap install arduino-cli
    ```
 
-3. Install ESP32 board support:
+   or for mac:
+   ```bash
+   brew install arduino-cli
+   ```
+
+4. Install ESP32 board support:
    ```bash
    # For ESP32:
    arduino-cli core update-index
    arduino-cli core install esp32:esp32
    ```
 
-4. Find your board and port:
+5. Find your board and port:
    ```bash
    arduino-cli board list
    ```
